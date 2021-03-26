@@ -30,3 +30,20 @@
 #
 #####################################################################
                     
+.data
+	displayAddress:	.word	0x10008000
+.text
+	lw $t0, displayAddress	# $t0 stores the base address for display
+	li $t1, 0xf4f5ba	# $t1 stores the yellow colour code
+
+	add $t2, $zero, $zero
+	addi $t3, $zero, 16384
+loop:
+	
+	sw $t1, 0($t0)	 # paint the first (top-left) unit some weird color. 
+	addi $t0, $t0, 4 # increment the byte address by 4
+	blt $t2, $t3, loop # continue loop
+	
+Exit:
+	li $v0, 10 # terminate the program gracefully
+	syscall
