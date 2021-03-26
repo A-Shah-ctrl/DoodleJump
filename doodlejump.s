@@ -8,7 +8,7 @@
 # - Student 2: Yash Dave, 1006140203
 #
 # Bitmap Display Configuration:
-# - Unit width in pixels: 8					     
+# - Unit width in pixels: 8
 # - Unit height in pixels: 8
 # - Display width in pixels: 256
 # - Display height in pixels: 256
@@ -29,21 +29,55 @@
 # - (write here, if any)
 #
 #####################################################################
-                    
+
 .data
 	displayAddress:	.word	0x10008000
 .text
 	lw $t0, displayAddress	# $t0 stores the base address for display
-	li $t1, 0xf4f5ba	# $t1 stores the yellow colour code
+	li $t1, 0xBFFFF7	# $t1 stores the blue colour code
+  	li $t2, 0x050A45
+  	li $t3, 0
 
-	add $t2, $zero, $zero
-	addi $t3, $zero, 16384
-loop:
 	
-	sw $t1, 0($t0)	 # paint the first (top-left) unit some weird color. 
-	addi $t0, $t0, 4 # increment the byte address by 4
-	blt $t2, $t3, loop # continue loop
+reset:
+	sw $t1, 0($t0)
+	sw $t1, 4($t0)
+	sw $t1, 8($t0)
+	sw $t1, 12($t0)	 
+	sw $t1, 16($t0)	 
+	sw $t1, 20($t0)	 
+	sw $t1, 24($t0)	 
+	sw $t1, 28($t0)	 
+	sw $t1, 32($t0)	 
+	sw $t1, 36($t0)	
+	sw $t1, 40($t0)	 
+	sw $t1, 44($t0)	 
+	sw $t1, 48($t0)	 
+	sw $t1, 52($t0)	 
+	sw $t1, 56($t0)	 
+	sw $t1, 60($t0)	 
+	sw $t1, 64($t0)
+	sw $t1, 68($t0)
+	sw $t1, 72($t0)
+	sw $t1, 76($t0)
+	sw $t1, 80($t0)
+	sw $t1, 84($t0)
+	sw $t1, 88($t0)
+	sw $t1, 92($t0)
+	sw $t1, 96($t0)
+	sw $t1, 100($t0)
+	sw $t1, 104($t0)
+	sw $t1, 108($t0)
+	sw $t1, 112($t0)
+	sw $t1, 116($t0)
+	sw $t1, 120($t0)
+	sw $t1, 124($t0)
+	sw $t1, 128($t0)
 	
+	addi $t0, $t0, 128
+	addi $t3, $t3, 1
+	bne $t3, 32, reset
+
 Exit:
 	li $v0, 10 # terminate the program gracefully
 	syscall
