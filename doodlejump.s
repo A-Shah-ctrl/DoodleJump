@@ -32,12 +32,17 @@
 
 .data
 	displayAddress:	.word	0x10008000
+	playerAddress: .word 	0x10008000
+	
 .text
 	lw $t0, displayAddress	# $t0 stores the base address for display
 	li $t1, 0xBFFFF7	# $t1 stores the blue colour code
-  	li $t2, 0x050A45
-  	li $t3, 0
-
+  	li $t2, 0x050A45	# Color of bars
+  	li $t3, 0		# $t3 counts the number of rows
+  	li $t4, 0x66440E	# $t4 stores the color of player 1
+  	li $t5, 1		# 1 = up, 0 = down
+  	lw $t6, playerAddress	# $t6 stores the address of player 1
+	addi $t6, $t6, 4028
 	
 reset:
 	sw $t1, 0($t0)
@@ -72,11 +77,20 @@ reset:
 	sw $t1, 116($t0)
 	sw $t1, 120($t0)
 	sw $t1, 124($t0)
-	sw $t1, 128($t0)
+	# sw $t1, 128($t0)
 	
 	addi $t0, $t0, 128
 	addi $t3, $t3, 1
 	bne $t3, 32, reset
+
+onedoodle:
+	
+	sw $t4, 0($t6)
+	sw $t4, 8($t6)
+	sw $t4, -124($t6)
+	sw $t4, -128($t6)
+	sw $t4, -252($t6)
+	sw $t4, -120($t6)
 
 Exit:
 	li $v0, 10 # terminate the program gracefully
