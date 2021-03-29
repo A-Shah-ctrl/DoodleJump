@@ -31,20 +31,26 @@
 #####################################################################
 
 .data
+	colours: .word 0xBFFFF7, 0x050A45, 0x66440E # colours[0]=background, colours[1]= bars and colours[2] = player1
 	displayAddress:	.word	0x10008000
 	playerAddress: .word 	0x10008000
 	
 .text
-	lw $t0, displayAddress	# $t0 stores the base address for display
-	li $t1, 0xBFFFF7	# $t1 stores the blue colour code
-  	li $t2, 0x050A45	# Color of bars
-  	li $t3, 0		# $t3 counts the number of rows
-  	li $t4, 0x66440E	# $t4 stores the color of player 1
+	
   	li $t5, 1		# 1 = up, 0 = down
   	lw $t6, playerAddress	# $t6 stores the address of player 1
 	addi $t6, $t6, 4028
+
+# =================== PAINT FUNCTION ============================
+# Paints the background colour of the screen
+paint:
+	lw $t0, displayAddress	# $t0 stores the base address for display
+	la $s0, colours 
+	lw $t1, 0($s0) #Loading the background colour into regsiter $t1
+	li $t2, 0      #Initializing counter for backcolour loop
+	j backcolour
 	
-reset:
+backcolour:
 	sw $t1, 0($t0)
 	sw $t1, 4($t0)
 	sw $t1, 8($t0)
@@ -77,20 +83,20 @@ reset:
 	sw $t1, 116($t0)
 	sw $t1, 120($t0)
 	sw $t1, 124($t0)
-	# sw $t1, 128($t0)
 	
 	addi $t0, $t0, 128
-	addi $t3, $t3, 1
-	bne $t3, 32, reset
-
-onedoodle:
+	addi $t2, $t2, 1
+	bne $t2, 32, backcolour	
 	
-	sw $t4, 0($t6)
-	sw $t4, 8($t6)
-	sw $t4, -124($t6)
-	sw $t4, -128($t6)
-	sw $t4, -252($t6)
-	sw $t4, -120($t6)
+onedoodle:
+	la $s0, colours 
+	lw $t1, 8($s0) # Loading the player1 colour into regsiter $t1
+	sw $t1, 0($t6)
+	sw $t1, 8($t6)
+	sw $t1, -124($t6)
+	sw $t1, -128($t6)
+	sw $t1, -252($t6)
+	sw $t1, -120($t6)
 
 Exit:
 	li $v0, 10 # terminate the program gracefully
