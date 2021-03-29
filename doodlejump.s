@@ -32,6 +32,7 @@
 
 .data
 	colours: .word 0xBFFFF7, 0x050A45, 0x66440E # colours[0]=background, colours[1]= bars and colours[2] = player1
+	bars: .word 3968, 3072, 1024 # bars[0] = bar1, bars[1]= bar2, bars[2] = bar3
 	displayAddress:	.word	0x10008000
 	playerAddress: .word 	0x10008000
 	
@@ -86,7 +87,48 @@ backcolour:
 	
 	addi $t0, $t0, 128
 	addi $t2, $t2, 1
-	bne $t2, 32, backcolour	
+	bne $t2, 32, backcolour
+		
+drawBars:
+	la $s0, colours
+	lw $t1, 4($s0) # Loading the bar colour into regsiter $t1
+	la $s0, bars
+	# ===== Paints first bar on screen ======
+	lw $t0, displayAddress # Loading the displayAddress
+	lw $t2, 0($s0) # Loading address of first bar
+	add $t0, $t0, $t2
+	sw $t1, 0($t0)
+	sw $t1, 4($t0)
+	sw $t1, 8($t0)
+	sw $t1, 12($t0)	 
+	sw $t1, 16($t0)	 
+	sw $t1, 20($t0)	 
+	sw $t1, 24($t0)	 
+	sw $t1, 28($t0)
+	# ===== Paints second bar on screen ======
+	lw $t0, displayAddress # Loading the displayAddress
+	lw $t2, 4($s0) # Loading address of second bar
+	add $t0, $t0, $t2
+	sw $t1, 0($t0)
+	sw $t1, 4($t0)
+	sw $t1, 8($t0)
+	sw $t1, 12($t0)	 
+	sw $t1, 16($t0)	 
+	sw $t1, 20($t0)	 
+	sw $t1, 24($t0)	 
+	sw $t1, 28($t0)
+	# ===== Paints third bar on screen ======
+	lw $t0, displayAddress # Loading the displayAddress
+	lw $t2, 8($s0) # Loading address of third bar
+	add $t0, $t0, $t2
+	sw $t1, 0($t0)
+	sw $t1, 4($t0)
+	sw $t1, 8($t0)
+	sw $t1, 12($t0)	 
+	sw $t1, 16($t0)	 
+	sw $t1, 20($t0)	 
+	sw $t1, 24($t0)	 
+	sw $t1, 28($t0)
 	
 onedoodle:
 	la $s0, colours 
