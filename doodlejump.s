@@ -35,10 +35,13 @@
 	bars: .word 3968, 3072, 1024 # bars[0] = bar1, bars[1]= bar2, bars[2] = bar3
 	displayAddress:	.word	0x10008000
 	playerAddress: .word 	0x10008000
+	jump: .word 1 #If 1, doodler goes high, 0 falls down
+	height: .word 0
 	
 .text
-	
-  	li $t5, 1		# 1 = up, 0 = down
+	lw $t3, height
+	lw $t4, jump
+  	li $t5, -2432		# 1 = up, 0 = down
   	lw $t6, playerAddress	# $t6 stores the address of player 1
 	addi $t6, $t6, 4028
 
@@ -131,6 +134,7 @@ drawBars:
 	sw $t1, 28($t0)
 	
 onedoodle:
+	
 	la $s0, colours 
 	lw $t1, 8($s0) # Loading the player1 colour into regsiter $t1
 	sw $t1, 0($t6)
@@ -139,6 +143,55 @@ onedoodle:
 	sw $t1, -128($t6)
 	sw $t1, -252($t6)
 	sw $t1, -120($t6)
+
+jumpdoodle:
+	
+	la $s0, colours 
+	lw $t1, 0($s0) # Loading the background colour into regsiter $t1
+	sw $t1, 0($t6)
+	sw $t1, 8($t6)
+	sw $t1, -124($t6)
+	sw $t1, -128($t6)
+	sw $t1, -252($t6)
+	sw $t1, -120($t6)
+	
+	bgtz $t3, CJUMP
+	ble $t3, $t5, CFALL
+	j CHECK
+CFALL:
+
+	addi $t4, $t4, -1
+	j CHECK
+
+CJUMP:
+	
+	addi $t4, $t4, 1
+	
+CHECK:
+
+	bgtz $t4, ELSE	# Check if falling or jumping
+
+THEN:
+
+	addi $t6, $t6, 128
+	addi $t3, $t3, 128	
+	j CONT
+
+ELSE:
+
+	addi $t6, $t6, -128
+	addi $t3, $t3, -128
+
+CONT:
+
+	lw $t1, 8($s0) # Loading the player1 colour into regsiter $t1
+	sw $t1, 0($t6)
+	sw $t1, 8($t6)
+	sw $t1, -124($t6)
+	sw $t1, -128($t6)
+	sw $t1, -252($t6)
+	sw $t1, -120($t6)
+	j jumpdoodle
 
 Exit:
 	li $v0, 10 # terminate the program gracefully
