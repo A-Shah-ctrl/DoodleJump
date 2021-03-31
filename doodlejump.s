@@ -39,9 +39,9 @@
 	height: .word 0
 	
 .text
-	lw $t3, height
-	lw $t4, jump
-  	li $t5, -2432		# 1 = up, 0 = down
+	lw $s1, height
+	lw $s2, jump		# 1 = up, 0 = down
+  	li $t5, -2432		
   	lw $t6, playerAddress	# $t6 stores the address of player 1
 	addi $t6, $t6, 4028
 
@@ -155,35 +155,37 @@ jumpdoodle:
 	sw $t1, -252($t6)
 	sw $t1, -120($t6)
 	
-	bgtz $t3, CJUMP
-	ble $t3, $t5, CFALL
+	bgtz $s1, CJUMP
+	ble $s1, $t5, CFALL
 	j CHECK
 CFALL:
 
-	addi $t4, $t4, -1
+	addi $s2, $s2, -1
 	j CHECK
 
 CJUMP:
 	
-	addi $t4, $t4, 1
+	addi $s2, $s2, 1
 	
 CHECK:
 
-	bgtz $t4, ELSE	# Check if falling or jumping
+	bgtz $s2, ELSE	# Check if falling or jumping
 
 THEN:
 
 	addi $t6, $t6, 128
-	addi $t3, $t3, 128	
+	addi $s1, $s1, 128	
 	j CONT
 
 ELSE:
 
 	addi $t6, $t6, -128
-	addi $t3, $t3, -128
+	addi $s1, $s1, -128
 
 CONT:
-
+	
+	li $a0, 32
+	addi $a0, $a0, 1
 	lw $t1, 8($s0) # Loading the player1 colour into regsiter $t1
 	sw $t1, 0($t6)
 	sw $t1, 8($t6)
