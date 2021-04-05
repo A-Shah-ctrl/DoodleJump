@@ -5,8 +5,8 @@
 	playerAddress: .word 	0x10008000
 	jump: .word 1 #If 1, doodler goes high, 0 falls down
 	height: .word 0
-	maxheight: .word -2432
-	ourconstant: .word -2432 # Total height at which the doodler appears to jump
+	maxheight: .word -2560
+	ourconstant: .word -2560 # Total height at which the doodler appears to jump
 	
 .globl main
 
@@ -20,17 +20,41 @@
 	lw $t6, playerAddress	# $t6 stores the address of player 1
 	addi $t6, $t6, 4028
 	
-main: 	jal base
+main: 	
+
+	#IFmain:
+		
+	#	beq $s3, $zero, ELSEmain
+	#	beq $s4, $s2, ELSEmain
+	#	jal base
+	#	jal jumpdoodle
+	#	jal addBar
+	#	jal movement
+	
+	#ELSEmain:
+	#	
+	#	jal base
+	#	jal jumpdoodle
+	#	jal addBar
+		
+		
+
+
+	jal base
+	jal jumpdoodle
 	jal addBar
 	jal movement
 	jal base
+	jal jumpdoodle
 	jal movement
 	jal base
+	jal jumpdoodle
 	jal movement
 	jal base
+	jal jumpdoodle
 	jal movement
 	addi $t3, $t3, 1
-	bne $t3, 4, main
+	bne $t3, 50, main
 	j end
 	
 base:	addi $sp, $sp, -4
@@ -39,7 +63,6 @@ base:	addi $sp, $sp, -4
 	lw $t0, displayAddress # Display address loaded
 	jal backcolour # paint the background
 	jal drawdoodle
-	jal jumpdoodle
 	la $s1, bars
 	lw $t0, 0($s1)
 	addi $sp, $sp, -4
@@ -99,22 +122,24 @@ drawdoodle:
 
 jumpdoodle:
 	
-	IF:
-		bne $s3, $zero, ELSE
+	IFjump:
+		bne $s3, $zero, ELSEjump
 		addi $t6, $t6, 256
 		addi $s2, $s2, 256
 		bgtz $s2, CHANGE1
 		jr $ra
 	
-	ELSE:
+	ELSEjump:
 		addi $t6, $t6, -256
 		addi $s2, $s2, -256
+		addi $s5, $s5, 256
 		ble $s2, $s4, CHANGE2
 		jr $ra
 	
 	CHANGE1:
 	
 		addi $s3, $s3, 1
+		la $s5, ourconstant 
 		jr $ra
 		
 	CHANGE2:
