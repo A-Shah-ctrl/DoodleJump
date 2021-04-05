@@ -79,7 +79,7 @@ movement:
 	sw $t0, 12($s0)
 	
 	li $v0, 32
-	la $a0, 1000
+	la $a0, 250
 	syscall
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4 # Pop the address of main function from stack
