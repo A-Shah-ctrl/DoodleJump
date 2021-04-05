@@ -2,11 +2,23 @@
 	colours: .word 0xBFFFF7, 0x050A45, 0x66440E 
 	bars: .word 4000, 3008, 1952, 976 #starting locations of the bars
 	displayAddress:	.word	0x10008000
+	playerAddress: .word 	0x10008000
+	jump: .word 1 #If 1, doodler goes high, 0 falls down
+	height: .word 0
+	maxheight: .word -2432
+	ourconstant: .word -2432 # Total height at which the doodler appears to jump
 	
 .globl main
 
 .text
-	li $t3, 0
+	
+	lw $s5, ourconstant
+	lw $s4, maxheight
+	lw $s2, height
+	lw $s3, jump		# 1 = up, 0 = down
+	li $t4, 1
+	lw $t6, playerAddress	# $t6 stores the address of player 1
+	addi $t6, $t6, 4028
 	
 main: 	jal base
 	jal addBar
@@ -26,6 +38,8 @@ base:	addi $sp, $sp, -4
 	li $t2, 0
 	lw $t0, displayAddress # Display address loaded
 	jal backcolour # paint the background
+	jal drawdoodle
+	jal jumpdoodle
 	la $s1, bars
 	lw $t0, 0($s1)
 	addi $sp, $sp, -4
@@ -71,6 +85,44 @@ movement:
 	addi $sp, $sp, 4 # Pop the address of main function from stack
 	jr $ra
 
+drawdoodle:
+	
+	la $s0, colours 
+	lw $t1, 8($s0) # Loading the player1 colour into regsiter $t1
+	sw $t1, 0($t6)
+	sw $t1, 8($t6)
+	sw $t1, -124($t6)
+	sw $t1, -128($t6)
+	sw $t1, -252($t6)
+	sw $t1, -120($t6)
+	jr $ra
+
+jumpdoodle:
+	
+	IF:
+		bne $s3, $zero, ELSE
+		addi $t6, $t6, 256
+		addi $s2, $s2, 256
+		bgtz $s2, CHANGE1
+		jr $ra
+	
+	ELSE:
+		addi $t6, $t6, -256
+		addi $s2, $s2, -256
+		ble $s2, $s4, CHANGE2
+		jr $ra
+	
+	CHANGE1:
+	
+		addi $s3, $s3, 1
+		jr $ra
+		
+	CHANGE2:
+		
+		addi $s3, $s3, -1
+		jr $ra
+		
+	
 addBar: 
 	addi $sp, $sp, -4
 	sw $ra, 0($sp) # Push address of main function onto the stack
