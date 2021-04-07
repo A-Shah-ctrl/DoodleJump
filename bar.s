@@ -22,40 +22,53 @@
 	
 main: 	
 
-	#IFmain:
+	IFmain:
 		
-	#	beq $s3, $zero, ELSEmain
-	#	beq $s4, $s2, ELSEmain
-	#	jal base
-	#	jal jumpdoodle
-	#	jal addBar
-	#	jal movement
+		beq $s3, $zero, ELSEmain
+		bne $s4, $s2, ELSEmain
+		jal base
+		jal addBar
+		jal movement
+		jal base
+		jal movement
+		jal base
+		jal movement
+		jal base
+		jal movement
+		jal base
+		j REST
+		
 	
-	#ELSEmain:
-	#	
-	#	jal base
-	#	jal jumpdoodle
-	#	jal addBar
+	ELSEmain:
+		
+		jal base
+		jal jumpdoodle
+		jal base
+		jal jumpdoodle
+		jal base
+		jal jumpdoodle
+		jal base
+		jal jumpdoodle
+		jal base
+		jal jumpdoodle
+		jal base
+		jal jumpdoodle
+		jal base
+		jal jumpdoodle
+		jal base
+		jal jumpdoodle
+		jal base
+		jal jumpdoodle
+		jal base
+		jal jumpdoodle
+		jal base
+		jal jumpdoodle
 		
 		
-
-
-	jal base
-	jal jumpdoodle
-	jal addBar
-	jal movement
-	jal base
-	jal jumpdoodle
-	jal movement
-	jal base
-	jal jumpdoodle
-	jal movement
-	jal base
-	jal jumpdoodle
-	jal movement
-	addi $t3, $t3, 1
-	bne $t3, 50, main
-	j end
+	REST:
+		addi $t3, $t3, 1
+		bne $t3, 50, main
+		j end
 	
 base:	addi $sp, $sp, -4
 	sw $ra, 0($sp) # Push address of main function onto the stack
@@ -102,7 +115,7 @@ movement:
 	sw $t0, 12($s0)
 	
 	li $v0, 32
-	la $a0, 250
+	la $a0, 300
 	syscall
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4 # Pop the address of main function from stack
@@ -124,29 +137,41 @@ jumpdoodle:
 	
 	IFjump:
 		bne $s3, $zero, ELSEjump
-		addi $t6, $t6, 256
-		addi $s2, $s2, 256
+		addi $t6, $t6, 128
+		addi $s2, $s2, 128
 		bgtz $s2, CHANGE1
+		li $v0, 32
+		la $a0, 125
+		syscall
 		jr $ra
 	
 	ELSEjump:
-		addi $t6, $t6, -256
-		addi $s2, $s2, -256
-		addi $s5, $s5, 256
+		addi $t6, $t6, -128
+		addi $s2, $s2, -128
+		addi $s5, $s5, 128
 		ble $s2, $s4, CHANGE2
+		li $v0, 32
+		la $a0, 125
+		syscall
 		jr $ra
 	
 	CHANGE1:
 	
 		addi $s3, $s3, 1
 		la $s5, ourconstant 
+		li $v0, 32
+		la $a0, 125
+		syscall
 		jr $ra
 		
 	CHANGE2:
 		
 		addi $s3, $s3, -1
+		li $v0, 32
+		la $a0, 125
+		syscall
 		jr $ra
-		
+
 	
 addBar: 
 	addi $sp, $sp, -4
