@@ -1,8 +1,43 @@
+#####################################################################
+#
+# CSC258H5S Winter 2021 Assembly Programming Project
+# University of Toronto Mississauga
+#
+# Group members:
+# - Student 1: Ashka , 1005994952
+# - Student 2: Yash Dave, 1006140203
+#
+# Bitmap Display Configuration:
+# - Unit width in pixels: 8
+# - Unit height in pixels: 8
+# - Display width in pixels: 256
+# - Display height in pixels: 256
+# - Base Address for Display: 0x10008000 ($gp)
+#
+# Which milestone is reached in this submission?
+# (See the assignment handout for descriptions of the milestones)
+# - Milestone 1/2/3/4/5 (choose the one the applies)
+#
+# Which approved additional features have been implemented?
+# (See the assignment handout for the list of additional features)
+# 1. (fill in the feature, if any)
+# 2. (fill in the feature, if any)
+# 3. (fill in the feature, if any)
+# ... (add more if necessary)
+#
+# Any additional information that the TA needs to know:
+# - (write here, if any)
+#
+#####################################################################
 .data
 	colours: .word 0xBFFFF7, 0x050A45, 0x66440E 
 	bars: .word 4000, 3008, 1952, 976 #starting locations of the bars
 	displayAddress:	.word	0x10008000
 	playerAddress: .word 	0x10008000
+	keystroke: .word	0xffff0000
+	keyvalue: .word		0xffff0004
+	leftKey: .word 		##############	
+	rightKey: .word 		##############	
 	jump: .word 1 #If 1, doodler goes high, 0 falls down
 	height: .word 0
 	maxheight: .word -2560
@@ -29,13 +64,16 @@ main:
 		jal base
 		jal addBar
 		jal movement
+		jal touchbar
 		jal base
 		jal movement
+		jal touchbar
 		jal base
 		jal movement
+		jal touchbar
 		jal base
 		jal movement
-		jal base
+		jal touchbar
 		j REST
 		
 	
@@ -44,26 +82,35 @@ main:
 		jal base
 		jal jumpdoodle
 		jal base
+		jal touchbar
 		jal jumpdoodle
 		jal base
+		jal touchbar
 		jal jumpdoodle
 		jal base
+		jal touchbar
 		jal jumpdoodle
 		jal base
+		jal touchbar
 		jal jumpdoodle
 		jal base
+		jal touchbar
 		jal jumpdoodle
 		jal base
+		jal touchbar
 		jal jumpdoodle
 		jal base
+		jal touchbar
 		jal jumpdoodle
 		jal base
+		jal touchbar
 		jal jumpdoodle
 		jal base
+		jal touchbar
 		jal jumpdoodle
 		jal base
+		jal touchbar
 		jal jumpdoodle
-		
 		
 	REST:
 		addi $t3, $t3, 1
@@ -172,6 +219,165 @@ jumpdoodle:
 		syscall
 		jr $ra
 
+touchbar:
+	
+	IFtouch:
+		
+		addi $t6, $t6, 128 	# bringing the left leg of doodler down
+		lw $t0, bars
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		lw $t0, 4($s0)
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		lw $t0, 8($s0)
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		lw $t0, 12($s0)
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT
+		addi $t6, $t6, -128
+		
+		addi $t6, $t6, 136
+		lw $t0, bars
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		lw $t0, 4($s0)
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		lw $t0, 8($s0)
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		lw $t0, 12($s0)
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t0, $t0, 4
+		beq $t6, $t0, CONT2
+		addi $t6, $t6, -136
+		j ENDtouch
+	
+	CONT:
+		addi $t6, $t6, -128
+		lw $s5, ourconstant
+		li $s3, 1
+		j ENDtouch
+	
+	CONT2:
+		addi $t6, $t6, -136
+		lw $s5, ourconstant
+		li $s3, 1
+		j ENDtouch
+	
+	ENDtouch:
+		
+		jr $ra
+	
+# movelrdoodle:
+	
+#	IFmove:
+#		beq $t
 	
 addBar: 
 	addi $sp, $sp, -4
