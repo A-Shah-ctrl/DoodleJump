@@ -36,17 +36,16 @@
 	playerAddress: .word 	0x10008000
 	keystroke: .word	0xffff0000
 	keyvalue: .word		0xffff0004
-	leftKey: .word 		##############	
-	rightKey: .word 		##############	
+	leftKey: .word 		0x0000006a	
+	rightKey: .word 	0x0000006b	
 	jump: .word 1 #If 1, doodler goes high, 0 falls down
 	height: .word 0
-	maxheight: .word -2560
-	ourconstant: .word -2560 # Total height at which the doodler appears to jump
+	maxheight: .word -1920
+	ourconstant: .word -1920 # Total height at which the doodler appears to jump
 	
 .globl main
 
-.text
-	
+.text	
 	lw $s5, ourconstant
 	lw $s4, maxheight
 	lw $s2, height
@@ -149,20 +148,23 @@ movement:
 	sw $ra, 0($sp) # Push address of main function onto the stack
 	la $s0, bars
 	lw $t0, 0($s0) # First bar
-	addi $t0, $t0, 256
+	addi $t0, $t0, 128
 	sw $t0, 0($s0)
 	lw $t0, 4($s0) # Second bar
-	addi $t0, $t0, 256
+	addi $t0, $t0, 128
 	sw $t0, 4($s0)
 	lw $t0, 8($s0) # Third bar
-	addi $t0, $t0, 256
+	addi $t0, $t0, 128
 	sw $t0, 8($s0)
 	lw $t0, 12($s0) # Fourth bar
-	addi $t0, $t0, 256
+	addi $t0, $t0, 128
 	sw $t0, 12($s0)
 	
+	# =====
+	addi $s5, $s5, 128
+	# =====
 	li $v0, 32
-	la $a0, 300
+	la $a0, 150
 	syscall
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4 # Pop the address of main function from stack

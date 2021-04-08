@@ -157,7 +157,7 @@ paintSun:
 	lw $t2, displayAddress # Display address 
 			
 	lw $t1, 0($sp)
-	addi $sp, $sp, 4 # Pop the address of bar from stack 
+	addi $sp, $sp, 4 # Pop the colour from stack 
 	
 	lw $t0, 0($sp)
 	addi $sp, $sp, 4 # Pop the address of bar from stack 
