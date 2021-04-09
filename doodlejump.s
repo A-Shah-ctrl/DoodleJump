@@ -1,39 +1,81 @@
-.data 
-			
-	colourDay: .word 0xBFFFF7, 0xF45F25, 0x050A45, 0x610000 # Sky, Sun, Bar, Doodle 
-	colourNight: .word 0xF5F1D8, 0x000000, 0x2DF748, 0xF72D56 # Sky, Moon, Bar, Doodle 
-	currCol: .word 0xBFFFF7, 0xF45F25, 0x050A45, 0x610000
-	position: .word 16 # position of the sun or moon 
-	playerPosition: .word 4028
-	time: .word  1 # 1 = Day 0 = Night
-	displayAddress:	.word	0x10008000 # Screen start
-	bars: .word 4000, 3008, 1952, 976 # starting locations of the bars
+#####################################################################
+#
+# CSC258H5S Winter 2021 Assembly Programming Project
+# University of Toronto Mississauga
+#
+# Group members:
+# - Student 1: Ashka Shah, 1005994952
+# - Student 2: Yash Dave, 1006140203
+#
+# Bitmap Display Configuration:
+# - Unit width in pixels: 8
+# - Unit height in pixels: 8
+# - Display width in pixels: 256
+# - Display height in pixels: 256
+# - Base Address for Display: 0x10008000 ($gp)
+#
+# Which milestone is reached in this submission?
+# We reached milestone 5!!!!
+#
+# Which approved additional features have been implemented?
+# (See the assignment handout for the list of additional features)
+# 1. Dynamic Background, involves sun and moon
+# 2. (Dynamic On-Screen Messages
+# 3. (Difficulty) Number of platforms fluctuates
+# 
+# Any additional information that the TA needs to know:
+# - The Player is unable to wrap around due to increased difficulty
+# - Invisible platforms are added to counteract the difficulty
+#
+#####################################################################
+.data
+	bars: .word 4000, 3008, 1952, 976 #starting locations of the bars
+	displayAddress:	.word	0x10008000
+	playerAddress: .word 	0x10008000
 	jump: .word 1 #If 1, doodler goes high, 0 falls down
 	height: .word 0
 	maxheight: .word -1920
 	ourconstant: .word -1920 # Total height at which the doodler appears to jump
-.text 
+	
+	colourDay: .word 0xFFF3D4, 0xF45F25, 0x050A45, 0x610000, 0x00FFFB # Sky, Sun, Bar, Doodle 
+	colourNight: .word 0x000000, 0xF5F1D8, 0x2DF748, 0xF72D56, 0xffff00 # Sky, Moon, Bar, Doodle 
+	currCol: .word 0xFFF3D4, 0xF45F25, 0x050A45, 0x610000, 0x00FFFB
+	position: .word 16 # position of the sun or moon 
+	time: .word  1 # 1 = Day 0 = Night
+	
+.globl main
 
-setUp:
+.text
+
 	lw $s5, ourconstant
 	lw $s4, maxheight
 	lw $s2, height
 	lw $s3, jump		# 1 = up, 0 = down
 	li $t4, 1
-	#lw $t6, playerAddress	# $t6 stores the address of player 1
-	#addi $t6, $t6, 4028
-
-main:  # while loop --> ends when touches the bottom of the
+	lw $t6, playerAddress	# $t6 stores the address of player 1
+	addi $t6, $t6, 3900
 	
+main: 	
 	lbu $t0, 0xffff0000
-	#jal drawdoodle
-	# Check if an event occured
-	bne $t0, 0, direction
+	beq $t0, 0, IFmain
+	#la $s0, key
+	lbu $t0, 0xffff0004
+	beq $t0, 0x00006a, moveLeft # j is left
+	beq $t0, 0x00006b, moveRight # k is right
+	j IFmain
+	
+moveLeft:
+	andi $t9, $t6, 127
+	beq $t9, 0, IFmain
+	addi $t6, $t6, -4
+	j IFmain
+	
+moveRight:
+	andi $t9, $t6, 127
+	beq $t9, 116, IFmain
+	addi $t6, $t6, 4
+	j IFmain
 
-processes:		
-	# Continue normal processes
-	# Doodle calculations
-	# If eligible --> move bars
 	IFmain:
 		
 		beq $s3, $zero, ELSEmain
@@ -41,12 +83,84 @@ processes:
 		jal base
 		jal addBar
 		jal movement
-		jal base
-		jal movement
-		jal base
-		jal movement
-		jal base
-		jal movement
+		
+		lbu $t0, 0xffff0000
+		beq $t0, 0, IFmain2
+		#la $s0, key
+		lbu $t0, 0xffff0004
+		beq $t0, 0x00006a, moveLeft2 # j is left
+		beq $t0, 0x00006b, moveRight2 # k is right
+		j IFmain2
+		
+		moveLeft2:
+			andi $t9, $t6, 127
+			beq $t9, 0, IFmain2
+			addi $t6, $t6, -4
+			j IFmain2
+	
+		moveRight2:
+			andi $t9, $t6, 127
+			beq $t9, 116, IFmain2
+			addi $t6, $t6, 4
+			j IFmain2
+			
+		IFmain2:
+			jal base
+			jal movement
+			
+			#beq $s3, $zero, ELSEmain
+			#blt $s4, $s2, ELSEmain
+			jal base
+			jal movement
+		
+		lbu $t0, 0xffff0000
+		beq $t0, 0, IFmain3
+		#la $s0, key
+		lbu $t0, 0xffff0004
+		beq $t0, 0x00006a, moveLeft3 # j is left
+		beq $t0, 0x00006b, moveRight3 # k is right
+		j IFmain3
+		
+		moveLeft3:
+			andi $t9, $t6, 127
+			beq $t9, 0, IFmain3
+			addi $t6, $t6, -4
+			j IFmain3
+	
+		moveRight3:
+			andi $t9, $t6, 127
+			beq $t9, 116, IFmain3
+			addi $t6, $t6, 4
+			j IFmain3
+			
+		IFmain3:
+			jal base
+			jal movement
+		
+		lbu $t0, 0xffff0000
+		beq $t0, 0, IFmain4
+		#la $s0, key
+		lbu $t0, 0xffff0004
+		beq $t0, 0x00006a, moveLeft4 # j is left
+		beq $t0, 0x00006b, moveRight4 # k is right
+		j IFmain4
+		
+		moveLeft4:
+			andi $t9, $t6, 127
+			beq $t9, 0, IFmain4
+			addi $t6, $t6, -4
+			j IFmain4
+	
+		moveRight4:
+			andi $t9, $t6, 127
+			beq $t9, 116, IFmain4
+			addi $t6, $t6, 4
+			j IFmain4
+			
+		IFmain4:
+			jal base
+			jal movement
+			
 		j REST
 		
 	
@@ -55,74 +169,73 @@ processes:
 		jal base
 		jal jumpdoodle
 		jal touchbar
-#		jal base
-#		jal jumpdoodle
-#		jal touchbar
-#		jal base
-#		jal jumpdoodle
-#		jal touchbar
-#		jal base
-#		jal touchbar
-#		jal base
-#		jal jumpdoodle
-#		jal touchbar
-#		jal base
-#		jal jumpdoodle
-#		jal touchbar
-#		jal base
-#		jal jumpdoodle
-#		jal touchbar
-#		jal base
-#		jal jumpdoodle
-#		jal touchbar
-#		jal base
-#		jal jumpdoodle
-#		jal touchbar
-#		jal base
-#		jal jumpdoodle
-#		jal touchbar
-#		jal base
-#		jal jumpdoodle
-#		jal touchbar
+		
 		
 	REST:
-		addi $t6, $t6, -4480
-		bgtz $t6, END
+		jal touchbottom
+		jal moveSun
 		j main
-	
-direction: 
-	#la $s0, key
-	lbu $t0, 0xffff0004
-	beq $t0, 0x00006a, moveLeft # j is left
-	beq $t0, 0x00006b, moveRight # k is right
-	j processes
-	
-# === Doodler moves one left ===
-moveLeft:
-	lw $s0, playerPosition
-	addi $s0, $s0, -4
-	sw $s0, playerPosition
-	j processes
 
-# === Doodler moves one left ===
-moveRight:
-	lw $s0, playerPosition
-	addi $s0, $s0, 4
-	sw $s0, playerPosition
-	j processes
-	# Check if time is 1 or 0
-	# If time is 1 certain block of code loads colours from colourDay to currCol
-	# If time is 0 certain block of code loads colours from colourNight to currCol
 	
-			
-	#loop back
-	
-# ===== Only paints the screen =====
-# 1) Sky
-# 2) Sun/Moon
-# 3) Bars
-# 4) Doodler
+moveSun: 
+	addi $sp, $sp, -4
+	sw $ra, 0($sp) # Push address of caller function onto the stack
+	lw $t0, position
+	beq $t0, 112, resetSun	
+	addi $t0, $t0, 8
+	sw $t0, position
+moveSunelse: 
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4 # Pop the address of main function from stack
+	jr $ra
 
+resetSun:
+	li $t1, 16
+	sw $t1, position
+	lw $t2, time
+	#change the value of time : if 1 --> 0 , if 0 --> 1
+	beq $t2, 1, switchNight
+	beq $t2, 0, switchDay
+resetDone:
+	j moveSunelse
+	
+switchNight:
+	li $t2, 0
+	sw $t2, time
+	la $t3, colourNight
+	la $t0, currCol
+	# change colours in currCol
+	lw $t2, 0($t3)
+	sw $t2, 0($t0)
+	lw $t2, 4($t3)
+	sw $t2, 4($t0)
+	lw $t2, 8($t3)
+	sw $t2, 8($t0)
+	lw $t2, 12($t3)
+	sw $t2, 12($t0)
+	lw $t2, 16($t3)
+	sw $t2, 16($t0)
+	j resetDone
+
+switchDay:
+	li $t2, 1
+	sw $t2, time
+	la $t3, colourDay
+	la $t0, currCol
+	# change colours in currCol
+	lw $t2, 0($t3)
+	sw $t2, 0($t0)
+	lw $t2, 4($t3)
+	sw $t2, 4($t0)
+	lw $t2, 8($t3)
+	sw $t2, 8($t0)
+	lw $t2, 12($t3)
+	sw $t2, 12($t0)
+	lw $t2, 16($t3)
+	sw $t2, 16($t0)
+	j resetDone
+	
+# === Function to repaint screen ====							
 base: 
 	addi $sp, $sp, -4
 	sw $ra, 0($sp) # Push address of main function onto the stack
@@ -130,11 +243,12 @@ base:
 	lw $t0, displayAddress # Display address loaded
 	jal sky
 	jal paintSunMoon
-	jal paintBar
 	jal drawdoodle
+	jal paintBar
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4 # Pop the address of main function from stack
 	jr $ra
+	
 #======= Function to paint sky colour ======
 sky:
 	la $s0, currCol
@@ -220,7 +334,452 @@ paintSunMoon:
 		 
 	sw $t1, 768($t0)
 	
+	jr $ra	
+	
+movement: 
+	addi $sp, $sp, -4
+	sw $ra, 0($sp) # Push address of main function onto the stack
+	la $s0, bars
+	lw $t0, 0($s0) # First bar
+	addi $t0, $t0, 256
+	sw $t0, 0($s0)
+	lw $t0, 4($s0) # Second bar
+	addi $t0, $t0, 256
+	sw $t0, 4($s0)
+	lw $t0, 8($s0) # Third bar
+	addi $t0, $t0, 256
+	sw $t0, 8($s0)
+	lw $t0, 12($s0) # Fourth bar
+	addi $t0, $t0, 256
+	sw $t0, 12($s0)
+	
+	addi $s5, $s5, 256
+	IFmovement:
+		ble $s5, $zero, ELSEmovement
+		j LEFTmovement
+	ELSEmovement:
+		lw $s5, ourconstant
+		li $s3, 0	
+	
+	LEFTmovement:
+		li $v0, 32
+		la $a0, 150
+		syscall
+		lw $ra, 0($sp)
+		addi $sp, $sp, 4 # Pop the address of main function from stack
+		jr $ra
+
+# ==== Function ot paint Doodler ====
+
+drawdoodle:
+	
+	la $s0, currCol
+	lw $t1, 12($s0) # Loading doodler colour into regsiter $t1
+	# lw $t2, displayAddress
+	# add $t6, $t2, $t6
+	sw $t1, 0($t6)
+	sw $t1, 8($t6)
+	sw $t1, -124($t6)
+	sw $t1, -128($t6)
+	sw $t1, -252($t6)
+	sw $t1, -120($t6)
+	
 	jr $ra
+
+jumpdoodle:
+	
+	IFjump:
+		bne $s3, $zero, ELSEjump
+		addi $t6, $t6, 128
+		addi $s2, $s2, 128
+		bgtz $s2, CHANGE1
+		li $v0, 32
+		la $a0, 150
+		syscall
+		jr $ra
+	
+	ELSEjump:
+		addi $t6, $t6, -128
+		addi $s2, $s2, -128
+		addi $s5, $s5, 128
+		ble $s2, $s4, CHECK
+		
+	CHECK:	
+		beq $zero, $s5, CHANGE2
+		li $v0, 32
+		la $a0, 150
+		syscall
+		jr $ra
+	
+	CHANGE1:
+	
+		li $s3, 1
+		la $s5, ourconstant 
+		li $v0, 32
+		la $a0, 150
+		syscall
+		jr $ra
+		
+	CHANGE2:
+		
+		li $s3, 0
+		li $v0, 32
+		la $a0, 150
+		syscall
+		jr $ra
+
+touchbar:
+	
+		bne $s3, $zero, ENDtouch
+	
+	IFtouch:
+		
+		# bringing the left leg of doodler down
+		la $t0, bars
+		lw $t8, displayAddress
+		lw $t5, 0($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		sub $t8, $t8, $t5
+		
+		lw $t5, 4($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		sub $t8, $t8, $t5
+		
+		lw $t5, 8($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		sub $t8, $t8, $t5
+		
+		lw $t5, 12($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
+		sub $t8, $t8, $t5
+		
+		addi $t6, $t6, 8 	# bringing the left leg of doodler down and right 2 units
+		lw $t5, 0($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		sub $t8, $t8, $t5
+		
+		lw $t5, 4($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+
+		sub $t8, $t8, $t5
+		
+		lw $t5, 8($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+
+		sub $t8, $t8, $t5
+		
+		lw $t5, 12($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+
+		sub $t8, $t8, $t5
+		
+		addi $t6, $t6, -8
+		
+		j ENDtouch
+	
+	CONT:
+		
+		lw $s5, ourconstant
+		li $s3, 1
+		j message
+		#j ENDtouch
+	
+	CONT2:
+		addi $t6, $t6, -8
+		lw $s5, ourconstant
+		li $s3, 1
+		j message
+		#j ENDtouch
+	
+	ENDtouch:
+		
+		jr $ra
+
+touchbottom:
+	
+	lw $t8, displayAddress
+	addi $t8, $t8, 3968
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	beq $t6, $t8, CONTbottom
+	addi $t8, $t8, 4
+	jr $ra
+	
+	
+# movelrdoodle:
+	
+#	IFmove:
+#		beq $t
+	
+addBar: 
+	addi $sp, $sp, -4
+	sw $ra, 0($sp) # Push address of main function onto the stack
+	la $s0, bars
+	lw $t0, 4($s0) # Second bar
+	sw $t0, 0($s0) # Store into bars[0]
+	lw $t0, 8($s0) # Third bar
+	sw $t0, 4($s0) # Store into bars[1]
+	lw $t0, 12($s0) # Fourth bar
+	sw $t0, 8($s0) # Store into bars[2]
+	
+	li $v0, 42 # Generate random number for position from 0 to 20
+	li $a1, 20
+	syscall
+	li $t0, 4
+	mult $a0, $t0
+	mflo $t0
+	sw $t0, 12($s0)# Store into bars[3]
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4 # Pop the address of main function from stack
+	jr $ra
+		
 
 #====== Function to paint all four bars ======
 paintBar:
@@ -279,381 +838,305 @@ paintBar:
 	
 	jr $ra
 	
-# ==== Function ot paint Doodler ====
+bye:
 
-drawdoodle:
-	
+	la $s0, displayAddress
+	lw $t0, 0($s0)
 	la $s0, currCol
-	lw $t1, 12($s0) # Loading doodler colour into regsiter $t1
-	lw $t2, displayAddress # Display address loaded
-	lw $t6, playerPosition
-	add $t6, $t2, $t6
-	sw $t1, 0($t6)
-	sw $t1, 8($t6)
-	sw $t1, -124($t6)
-	sw $t1, -128($t6)
-	sw $t1, -252($t6)
-	sw $t1, -120($t6)
+	lw $t9, 16($s0)
+	sw $t9, 1972($t0)
+	sw $t9, 1988($t0)
 	
-	jr $ra
+	sw $t9, 2484($t0)
+	sw $t9, 2488($t0)
+	sw $t9, 2492($t0)
+	
+	sw $t9, 2496($t0)
+	sw $t9,	2500($t0)
+	sw $t9, 2504($t0)
+	
+	sw $t9, 2612($t0)
+	sw $t9, 2740($t0)
+	
+	sw $t9, 2744($t0)
+	sw $t9, 2748($t0)
 
-movement: 
-	addi $sp, $sp, -4
-	sw $ra, 0($sp) # Push address of main function onto the stack
-	la $s0, bars
-	lw $t0, 0($s0) # First bar
-	addi $t0, $t0, 256
-	sw $t0, 0($s0)
-	lw $t0, 4($s0) # Second bar
-	addi $t0, $t0, 256
-	sw $t0, 4($s0)
-	lw $t0, 8($s0) # Third bar
-	addi $t0, $t0, 256
-	sw $t0, 8($s0)
-	lw $t0, 12($s0) # Fourth bar
-	addi $t0, $t0, 256
-	sw $t0, 12($s0)
-	addi $s5, $s5, 256
-	IFmovement:
-		ble $s5, $zero, ELSEmovement
-		j LEFTmovement
-	ELSEmovement:
-		lw $s5, ourconstant
-		li $s3, 0	
-	
-	LEFTmovement:
-		li $v0, 32
-		la $a0, 300
-		syscall
-		lw $ra, 0($sp)
-		addi $sp, $sp, 4 # Pop the address of main function from stack
-		jr $ra
+	sw $t9, 2752($t0)
+	sw $t9, 2756($t0)	
+	jr $ra		
 
-
-jumpdoodle:
-
-	
-	IFjump:
-		lw $t6, playerPosition
-		lw $s0, displayAddress
-		add $t6, $t6, $s0
-		bne $s3, $zero, ELSEjump
-		addi $t6, $t6, 128
-		addi $s2, $s2, 128
-		bgtz $s2, CHANGE1
-		li $v0, 32
-		la $a0, 125
-		syscall
-		jr $ra
-	
-	ELSEjump:
-		addi $t6, $t6, -128
-		addi $s2, $s2, -128
-		addi $s5, $s5, 128
-		ble $s2, $s4, CHECK
-		
-	CHECK:	
-		beq $zero, $s5, CHANGE2
-		li $v0, 32
-		la $a0, 125
-		syscall
-		jr $ra
-	
-	CHANGE1:
-	
-		li $s3, 1
-		la $s5, ourconstant 
-		li $v0, 32
-		la $a0, 125
-		syscall
-		jr $ra
-		
-	CHANGE2:
-		
-		li $s3, 0
-		li $v0, 32
-		la $a0, 125
-		syscall
-		jr $ra
-
-touchbar:
-	
-		bne $s3, $zero, ENDtouch
-	
-	IFtouch:
-		
-		addi $t6, $t6, 128 	# bringing the left leg of doodler down
-		la $t0, bars
-		lw $t8, displayAddress
-		lw $t5, 0($t0)
-		add $t8, $t8, $t5
-		
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		sub $t8, $t8, $t5
-		
-		lw $t5, 4($t0)
-		add $t8, $t8, $t5
-		
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-
-		sub $t8, $t8, $t5
-		
-		lw $t5, 8($t0)
-		add $t8, $t8, $t5
-		
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-
-		sub $t8, $t8, $t5
-		
-		lw $t5, 12($t0)
-		add $t8, $t8, $t5
-		
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT
-
-		sub $t8, $t8, $t5
-	
-		addi $t6, $t6, -128
-		
-		addi $t6, $t6, 136 	# bringing the left leg of doodler down and right 2 units
-		lw $t5, 0($t0)
-		add $t8, $t8, $t5
-		
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-
-		sub $t8, $t8, $t5
-		
-		lw $t5, 4($t0)
-		add $t8, $t8, $t5
-		
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-
-		sub $t8, $t8, $t5
-		
-		lw $t5, 8($t0)
-		add $t8, $t8, $t5
-		
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-
-		sub $t8, $t8, $t5
-		
-		lw $t5, 12($t0)
-		add $t8, $t8, $t5
-		
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-		addi $t5, $t5, 4
-		addi $t8, $t8, 4
-		beq $t6, $t8, CONT2
-
-		sub $t8, $t8, $t5
-		
-		addi $t6, $t6, -136
-		
-		j ENDtouch
-	
-	CONT:
-		
-		addi $t6, $t6, -128
-		lw $s5, ourconstant
-		li $s3, 1
-		j ENDtouch
-	
-	CONT2:
-		addi $t6, $t6, -136
-		lw $s5, ourconstant
-		li $s3, 1
-		j ENDtouch
-	
-	ENDtouch:
-		
-		jr $ra
-	
-addBar: 
-	addi $sp, $sp, -4
-	sw $ra, 0($sp) # Push address of main function onto the stack
-	la $s0, bars
-	lw $t0, 4($s0) # Second bar
-	sw $t0, 0($s0) # Store into bars[0]
-	lw $t0, 8($s0) # Third bar
-	sw $t0, 4($s0) # Store into bars[1]
-	lw $t0, 12($s0) # Fourth bar
-	sw $t0, 8($s0) # Store into bars[2]
-	
-	li $v0, 42 # Generate random number for position from 0 to 20
-	li $a1, 20
+# == messages ===
+message: 		
+	li $v0, 42 # Generate random number for position from 0 to 3
+	li $a1, 3
 	syscall
-	li $t0, 4
-	mult $a0, $t0
-	mflo $t0
-	sw $t0, 12($s0)# Store into bars[3]
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4 # Pop the address of main function from stack
-	jr $ra
-		
-END: 
-	li $v0, 10 
+
+	beq $a0, 0, cool	
+	beq $a0, 1, wow
+	beq $a0, 2, yay
+	beq $a0, 3, good
+	
+			
+yay: 	
+	la $s0, displayAddress
+	lw $t0, 0($s0)
+	la $s0, currCol
+	lw $t1, 16($s0)
+	
+	# Y 
+	sw $t1, 3104($t0)
+	sw $t1, 3116($t0)
+	sw $t1, 3232($t0)
+	sw $t1, 3244($t0)
+	
+	sw $t1, 3360($t0)
+	sw $t1, 3364($t0)
+	sw $t1, 3368($t0)
+	sw $t1, 3372($t0)
+	
+	sw $t1, 3500($t0)
+	sw $t1, 3628($t0)
+	sw $t1, 3624($t0)
+	sw $t1, 3620($t0)
+	
+	#A	
+	sw $t1, 3128($t0)
+	sw $t1, 3132($t0)
+	sw $t1, 3136($t0)
+	sw $t1, 3140($t0)
+	
+	sw $t1, 3256($t0)
+	sw $t1, 3384($t0)
+	sw $t1, 3512($t0)
+	sw $t1, 3640($t0)
+	
+	sw $t1, 3268($t0)
+	sw $t1, 3396($t0)
+	sw $t1, 3524($t0)
+	sw $t1, 3652($t0)
+	
+	sw $t1, 3388($t0)
+	sw $t1, 3392($t0)
+	
+	# Y 
+	sw $t1, 3148($t0)
+	sw $t1, 3160($t0)
+	sw $t1, 3276($t0)
+	sw $t1, 3288($t0)
+	
+	sw $t1, 3404($t0)
+	sw $t1, 3408($t0)
+	sw $t1, 3412($t0)
+	sw $t1, 3416($t0)
+	
+	sw $t1, 3544($t0)
+	sw $t1, 3672($t0)
+	sw $t1, 3668($t0)
+	sw $t1, 3664($t0)
+	
+	li $v0, 32
+	la $a0, 250
 	syscall
+	j ENDtouch
+		
+good: 
+	la $s0, displayAddress
+	lw $t0, 0($s0)
+	la $s0, currCol
+	lw $t1, 16($s0)
+	
+	# G
+	sw $t1, 3104($t0)
+	sw $t1, 3108($t0)
+	sw $t1, 3112($t0)
+	
+	sw $t1, 3232($t0)
+	sw $t1, 3360($t0)
+	sw $t1, 3488($t0)
+	
+	sw $t1, 3492($t0)
+	sw $t1, 3496($t0)
+	sw $t1, 3368($t0)
+	
+	# O
+	sw $t1, 3120($t0)
+	sw $t1, 3124($t0)
+	sw $t1, 3128($t0)
+	
+	sw $t1, 3248($t0)
+	sw $t1, 3376($t0)
+	sw $t1, 3504($t0)
+	
+	sw $t1, 3256($t0)
+	sw $t1, 3384($t0)
+	
+	sw $t1, 3508($t0)
+	sw $t1, 3512($t0)
+	
+	# O
+	sw $t1, 3136($t0)
+	sw $t1, 3140($t0)
+	sw $t1, 3144($t0)
+	
+	sw $t1, 3264($t0)
+	sw $t1, 3392($t0)
+	sw $t1, 3520($t0)
+	
+	sw $t1, 3272($t0)
+	sw $t1, 3400($t0)
+	
+	sw $t1, 3524($t0)
+	sw $t1, 3528($t0)
+	
+	# L
+	
+	sw $t1, 3284($t0)
+	sw $t1, 3280($t0)
+	sw $t1, 3408($t0)
+	
+	sw $t1, 3160($t0)
+	sw $t1, 3288($t0)
+	sw $t1, 3416($t0)
+	
+	sw $t1, 3536($t0)
+	sw $t1, 3540($t0)
+	sw $t1, 3544($t0)
+	
+	li $v0, 32
+	la $a0, 250
+	syscall
+	j ENDtouch
+	
+wow: 
+	la $s0, displayAddress
+	lw $t0, 0($s0)
+	la $s0, currCol
+	lw $t1, 16($s0)
+	
+	# W
+	sw $t1, 3104($t0)
+	sw $t1, 3232($t0)
+	sw $t1, 3360($t0)
+	sw $t1, 3488($t0)
+	
+	sw $t1, 3492($t0)
+	sw $t1, 3496($t0)
+	sw $t1, 3368($t0)
+	sw $t1, 3240($t0)
+	sw $t1, 3500($t0)
+	sw $t1, 3504($t0)
+
+	sw $t1, 3120($t0)
+	sw $t1, 3248($t0)
+	sw $t1, 3376($t0)
+	sw $t1, 3504($t0)
+	
+	# O
+	sw $t1, 3128($t0)
+	sw $t1, 3132($t0)
+	sw $t1, 3136($t0)
+	sw $t1, 3140($t0)
+	
+	sw $t1, 3256($t0)
+	sw $t1, 3384($t0)
+	sw $t1, 3512($t0)
+	
+	sw $t1, 3268($t0)
+	sw $t1, 3396($t0)
+	sw $t1, 3524($t0)
+	
+	sw $t1, 3516($t0)
+	sw $t1, 3520($t0)
+	
+	# W
+	sw $t1, 3148($t0)
+	sw $t1, 3276($t0)
+	sw $t1, 3404($t0)
+	sw $t1, 3532($t0)
+	
+	sw $t1, 3536($t0)
+	sw $t1, 3540($t0)
+	sw $t1, 3412($t0)
+	sw $t1, 3284($t0)
+	sw $t1, 3544($t0)
+	sw $t1, 3548($t0)
+
+	sw $t1, 3164($t0)
+	sw $t1, 3292($t0)
+	sw $t1, 3420($t0)
+	sw $t1, 3548($t0)
+	
+	li $v0, 32
+	la $a0, 250
+	syscall
+	j ENDtouch
+	
+cool:
+	la $s0, displayAddress
+	lw $t0, 0($s0)
+	la $s0, currCol
+	lw $t1, 16($s0)
+	
+	# C
+	sw $t1, 3104($t0)
+	sw $t1, 3108($t0)
+	sw $t1, 3112($t0)
+	
+	sw $t1, 3232($t0)
+	sw $t1, 3360($t0)
+	sw $t1, 3488($t0)
+	
+	sw $t1, 3492($t0)
+	sw $t1, 3496($t0)
+	
+	# O
+	sw $t1, 3120($t0)
+	sw $t1, 3124($t0)
+	sw $t1, 3128($t0)
+	
+	sw $t1, 3248($t0)
+	sw $t1, 3376($t0)
+	sw $t1, 3504($t0)
+	
+	sw $t1, 3256($t0)
+	sw $t1, 3384($t0)
+	
+	sw $t1, 3508($t0)
+	sw $t1, 3512($t0)
+	
+	# O
+	sw $t1, 3136($t0)
+	sw $t1, 3140($t0)
+	sw $t1, 3144($t0)
+	
+	sw $t1, 3264($t0)
+	sw $t1, 3392($t0)
+	sw $t1, 3520($t0)
+	
+	sw $t1, 3272($t0)
+	sw $t1, 3400($t0)
+	
+	sw $t1, 3524($t0)
+	sw $t1, 3528($t0)
+	
+	# L
+	sw $t1, 3152($t0)
+	sw $t1, 3280($t0)
+	sw $t1, 3408($t0)
+	
+	sw $t1, 3536($t0)
+	sw $t1, 3540($t0)
+	sw $t1, 3544($t0)	
+	
+	li $v0, 32
+	la $a0, 250
+	syscall
+	j ENDtouch
+	
+CONTbottom:
+	
+	jal base
+	jal bye
+	li $v0, 10
+	syscall	
+		

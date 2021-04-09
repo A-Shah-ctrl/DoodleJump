@@ -14,9 +14,8 @@
 # - Display height in pixels: 256
 # - Base Address for Display: 0x10008000 ($gp)
 #
-# Which milestone is reached in this submission?
-# (See the assignment handout for descriptions of the milestones)
-# - Milestone 1/2/3/4/5 (choose the one the applies)
+# Which milestone is reached in this submission? 
+# We have reached milestone 5!!!!!!!!!
 #
 # Which approved additional features have been implemented?
 # (See the assignment handout for the list of additional features)
@@ -25,7 +24,7 @@
 # 3. (Difficulty) Number of platforms fluctuates
 # 
 # Any additional information that the TA needs to know:
-# - Good luck marking this!
+# - Good luck marking this! It's a lighter issue
 #
 #####################################################################
 .data
@@ -37,9 +36,9 @@
 	maxheight: .word -1920
 	ourconstant: .word -1920 # Total height at which the doodler appears to jump
 	
-	colourDay: .word 0xBFFFF7, 0xF45F25, 0x050A45, 0x610000, 0x009933 # Sky, Sun, Bar, Doodle 
+	colourDay: .word 0xFFF3D4, 0xF45F25, 0x050A45, 0x610000, 0x00FFFB # Sky, Sun, Bar, Doodle 
 	colourNight: .word 0x000000, 0xF5F1D8, 0x2DF748, 0xF72D56, 0xffff00 # Sky, Moon, Bar, Doodle 
-	currCol: .word 0xBFFFF7, 0xF45F25, 0x050A45, 0x610000, 0x009933
+	currCol: .word 0xFFF3D4, 0xF45F25, 0x050A45, 0x610000, 0x00FFFB
 	position: .word 16 # position of the sun or moon 
 	time: .word  1 # 1 = Day 0 = Night
 	
@@ -822,6 +821,33 @@ paintBar:
 	
 	jr $ra
 	
+bye:
+
+	la $s0, displayAddress
+	lw $t0, 0($s0)
+	la $s0, currCol
+	lw $t9, 16($s0)
+	sw $t9, 1972($t0)
+	sw $t9, 1988($t0)
+	
+	sw $t9, 2484($t0)
+	sw $t9, 2488($t0)
+	sw $t9, 2492($t0)
+	
+	sw $t9, 2496($t0)
+	sw $t9,	2500($t0)
+	sw $t9, 2504($t0)
+	
+	sw $t9, 2612($t0)
+	sw $t9, 2740($t0)
+	
+	sw $t9, 2744($t0)
+	sw $t9, 2748($t0)
+
+	sw $t9, 2752($t0)
+	sw $t9, 2756($t0)	
+	jr $ra		
+
 # == messages ===
 message: 		
 	li $v0, 42 # Generate random number for position from 0 to 3
@@ -1093,6 +1119,7 @@ cool:
 CONTbottom:
 	
 	jal base
+	jal bye
 	li $v0, 10
 	syscall	
 		
