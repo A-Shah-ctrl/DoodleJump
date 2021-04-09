@@ -55,43 +55,39 @@ processes:
 		jal base
 		jal jumpdoodle
 		jal touchbar
-		jal base
-		jal jumpdoodle
-		jal touchbar
-		jal base
-		jal jumpdoodle
-		jal touchbar
-		jal base
-		jal jumpdoodle
-		jal touchbar
-		jal base
-		jal jumpdoodle
-		jal touchbar
-		jal base
-		jal jumpdoodle
-		jal touchbar
-		jal base
-		jal jumpdoodle
-		jal touchbar
-		jal base
-		jal jumpdoodle
-		jal touchbar
-		jal base
-		jal jumpdoodle
-		jal touchbar
-		jal base
-		jal jumpdoodle
-		jal touchbar
-		jal base
-		jal jumpdoodle
-		jal touchbar
+#		jal base
+#		jal jumpdoodle
+#		jal touchbar
+#		jal base
+#		jal jumpdoodle
+#		jal touchbar
+#		jal base
+#		jal touchbar
+#		jal base
+#		jal jumpdoodle
+#		jal touchbar
+#		jal base
+#		jal jumpdoodle
+#		jal touchbar
+#		jal base
+#		jal jumpdoodle
+#		jal touchbar
+#		jal base
+#		jal jumpdoodle
+#		jal touchbar
+#		jal base
+#		jal jumpdoodle
+#		jal touchbar
+#		jal base
+#		jal jumpdoodle
+#		jal touchbar
+#		jal base
+#		jal jumpdoodle
+#		jal touchbar
 		
 	REST:
-		addi $t3, $t3, 1
-		bne $t3, 50, main
-		li $v0, 32
-		la $a0, 300
-		syscall
+		addi $t6, $t6, -4480
+		bgtz $t6, END
 		j main
 	
 direction: 
@@ -335,8 +331,12 @@ movement:
 
 
 jumpdoodle:
+
 	
 	IFjump:
+		lw $t6, playerPosition
+		lw $s0, displayAddress
+		add $t6, $t6, $s0
 		bne $s3, $zero, ELSEjump
 		addi $t6, $t6, 128
 		addi $s2, $s2, 128
