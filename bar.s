@@ -23,6 +23,8 @@
 # 1. (fill in the feature, if any)
 # 2. (fill in the feature, if any)
 # 3. (fill in the feature, if any)
+# - Dynamic Background, involves sun and moon
+# - Dynamic On-Screen Messages
 # ... (add more if necessary)
 #
 # Any additional information that the TA needs to know:
@@ -36,8 +38,8 @@
 	playerAddress: .word 	0x10008000
 	keystroke: .word	0xffff0000
 	keyvalue: .word		0xffff0004
-	leftKey: .word 		0x0000006a	
-	rightKey: .word 	0x0000006b	
+	leftKey: .word 		##############	
+	rightKey: .word 		##############	
 	jump: .word 1 #If 1, doodler goes high, 0 falls down
 	height: .word 0
 	maxheight: .word -1920
@@ -45,7 +47,8 @@
 	
 .globl main
 
-.text	
+.text
+	
 	lw $s5, ourconstant
 	lw $s4, maxheight
 	lw $s2, height
@@ -59,20 +62,16 @@ main:
 	IFmain:
 		
 		beq $s3, $zero, ELSEmain
-		bne $s4, $s2, ELSEmain
+		ble $s4, $s2, ELSEmain
 		jal base
 		jal addBar
 		jal movement
-		jal touchbar
 		jal base
 		jal movement
-		jal touchbar
 		jal base
 		jal movement
-		jal touchbar
 		jal base
 		jal movement
-		jal touchbar
 		j REST
 		
 	
@@ -80,36 +79,37 @@ main:
 		
 		jal base
 		jal jumpdoodle
-		jal base
 		jal touchbar
-		jal jumpdoodle
 		jal base
-		jal touchbar
 		jal jumpdoodle
+		jal touchbar
 		jal base
-		jal touchbar
 		jal jumpdoodle
+		jal touchbar
 		jal base
-		jal touchbar
 		jal jumpdoodle
+		jal touchbar
 		jal base
-		jal touchbar
 		jal jumpdoodle
+		jal touchbar
 		jal base
-		jal touchbar
 		jal jumpdoodle
+		jal touchbar
 		jal base
-		jal touchbar
 		jal jumpdoodle
+		jal touchbar
 		jal base
-		jal touchbar
 		jal jumpdoodle
+		jal touchbar
 		jal base
-		jal touchbar
 		jal jumpdoodle
+		jal touchbar
 		jal base
-		jal touchbar
 		jal jumpdoodle
+		jal touchbar
+		jal base
+		jal jumpdoodle
+		jal touchbar
 		
 	REST:
 		addi $t3, $t3, 1
@@ -148,27 +148,32 @@ movement:
 	sw $ra, 0($sp) # Push address of main function onto the stack
 	la $s0, bars
 	lw $t0, 0($s0) # First bar
-	addi $t0, $t0, 128
+	addi $t0, $t0, 256
 	sw $t0, 0($s0)
 	lw $t0, 4($s0) # Second bar
-	addi $t0, $t0, 128
+	addi $t0, $t0, 256
 	sw $t0, 4($s0)
 	lw $t0, 8($s0) # Third bar
-	addi $t0, $t0, 128
+	addi $t0, $t0, 256
 	sw $t0, 8($s0)
 	lw $t0, 12($s0) # Fourth bar
-	addi $t0, $t0, 128
+	addi $t0, $t0, 256
 	sw $t0, 12($s0)
+	addi $s5, $s5, 256
+	IFmovement:
+		ble $s5, $zero, ELSEmovement
 	
-	# =====
-	addi $s5, $s5, 128
-	# =====
-	li $v0, 32
-	la $a0, 150
-	syscall
-	lw $ra, 0($sp)
-	addi $sp, $sp, 4 # Pop the address of main function from stack
-	jr $ra
+	ELSEmovement:
+		lw $s5, ourconstant
+		li $s3, 0	
+	
+	LEFTmovement:
+		li $v0, 32
+		la $a0, 300
+		syscall
+		lw $ra, 0($sp)
+		addi $sp, $sp, 4 # Pop the address of main function from stack
+		jr $ra
 
 drawdoodle:
 	
@@ -198,7 +203,10 @@ jumpdoodle:
 		addi $t6, $t6, -128
 		addi $s2, $s2, -128
 		addi $s5, $s5, 128
-		ble $s2, $s4, CHANGE2
+		ble $s2, $s4, CHECK
+		
+	CHECK:	
+		beq $zero, $s5, CHANGE2
 		li $v0, 32
 		la $a0, 125
 		syscall
@@ -206,7 +214,7 @@ jumpdoodle:
 	
 	CHANGE1:
 	
-		addi $s3, $s3, 1
+		li $s3, 1
 		la $s5, ourconstant 
 		li $v0, 32
 		la $a0, 125
@@ -215,7 +223,7 @@ jumpdoodle:
 		
 	CHANGE2:
 		
-		addi $s3, $s3, -1
+		li $s3, 0
 		li $v0, 32
 		la $a0, 125
 		syscall
@@ -223,144 +231,182 @@ jumpdoodle:
 
 touchbar:
 	
+		bne $s3, $zero, ENDtouch
+	
 	IFtouch:
 		
 		addi $t6, $t6, 128 	# bringing the left leg of doodler down
-		lw $t0, bars
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		lw $t0, 4($s0)
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		lw $t0, 8($s0)
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		lw $t0, 12($s0)
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT
+		la $t0, bars
+		lw $t8, displayAddress
+		lw $t5, 0($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		sub $t8, $t8, $t5
+		
+		lw $t5, 4($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		sub $t8, $t8, $t5
+		
+		lw $t5, 8($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		sub $t8, $t8, $t5
+		
+		lw $t5, 12($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT
+		sub $t8, $t8, $t5
+	
 		addi $t6, $t6, -128
 		
-		addi $t6, $t6, 136
-		lw $t0, bars
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		lw $t0, 4($s0)
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		lw $t0, 8($s0)
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		lw $t0, 12($s0)
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
-		addi $t0, $t0, 4
-		beq $t6, $t0, CONT2
+		addi $t6, $t6, 136 	# bringing the left leg of doodler down and right 2 units
+		lw $t5, 0($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		sub $t8, $t8, $t5
+		
+		lw $t5, 4($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		sub $t8, $t8, $t5
+		
+		lw $t5, 8($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		sub $t8, $t8, $t5
+		
+		lw $t5, 12($t0)
+		add $t8, $t8, $t5
+		
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		addi $t8, $t8, 4
+		beq $t6, $t8, CONT2
+		sub $t8, $t8, $t5
+		
 		addi $t6, $t6, -136
+		
 		j ENDtouch
 	
 	CONT:
+		
 		addi $t6, $t6, -128
 		lw $s5, ourconstant
 		li $s3, 1
