@@ -44,6 +44,8 @@
 	height: .word 0
 	maxheight: .word -1920
 	ourconstant: .word -1920 # Total height at which the doodler appears to jump
+	event: .word 0xffff0000 # if a key was pressed
+	key: .word 0xffff0004 # which key was pressed
 	
 .globl main
 
@@ -162,7 +164,7 @@ movement:
 	addi $s5, $s5, 256
 	IFmovement:
 		ble $s5, $zero, ELSEmovement
-	
+		j LEFTmovement
 	ELSEmovement:
 		lw $s5, ourconstant
 		li $s3, 0	
