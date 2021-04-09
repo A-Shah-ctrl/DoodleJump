@@ -23,8 +23,7 @@
 # 1. Dynamic Background, involves sun and moon
 # 2. (Dynamic On-Screen Messages
 # 3. (Difficulty) Number of platforms fluctuates
-# ... (add more if necessary)
-#
+# 
 # Any additional information that the TA needs to know:
 # - Good luck marking this!
 #
@@ -39,7 +38,7 @@
 	ourconstant: .word -1920 # Total height at which the doodler appears to jump
 	
 	colourDay: .word 0xBFFFF7, 0xF45F25, 0x050A45, 0x610000, 0x009933 # Sky, Sun, Bar, Doodle 
-	colourNight: .word 0xF5F1D8, 0x000000, 0x2DF748, 0xF72D56 # Sky, Moon, Bar, Doodle 
+	colourNight: .word 0x000000, 0xF5F1D8, 0x2DF748, 0xF72D56, 0xffff00 # Sky, Moon, Bar, Doodle 
 	currCol: .word 0xBFFFF7, 0xF45F25, 0x050A45, 0x610000, 0x009933
 	position: .word 16 # position of the sun or moon 
 	time: .word  1 # 1 = Day 0 = Night
@@ -146,15 +145,6 @@ moveRight:
 			jal base
 			jal movement
 			
-			
-			
-			
-			
-			#############
-		#jal base
-		#jal movement
-		#jal base
-		#jal movement
 		j REST
 		
 	
@@ -167,8 +157,69 @@ moveRight:
 		
 	REST:
 		jal touchbottom
+		jal moveSun
 		j main
+
 	
+moveSun: 
+	addi $sp, $sp, -4
+	sw $ra, 0($sp) # Push address of caller function onto the stack
+	lw $t0, position
+	beq $t0, 112, resetSun	
+	addi $t0, $t0, 8
+	sw $t0, position
+moveSunelse: 
+	lw $ra, 0($sp)
+	addi $sp, $sp, 4 # Pop the address of main function from stack
+	jr $ra
+
+resetSun:
+	li $t1, 16
+	sw $t1, position
+	lw $t2, time
+	#change the value of time : if 1 --> 0 , if 0 --> 1
+	beq $t2, 1, switchNight
+	beq $t2, 0, switchDay
+resetDone:
+	j moveSunelse
+	
+switchNight:
+	li $t2, 0
+	sw $t2, time
+	la $t3, colourNight
+	la $t0, currCol
+	# change colours in currCol
+	lw $t2, 0($t3)
+	sw $t2, 0($t0)
+	lw $t2, 4($t3)
+	sw $t2, 4($t0)
+	lw $t2, 8($t3)
+	sw $t2, 8($t0)
+	lw $t2, 12($t3)
+	sw $t2, 12($t0)
+	lw $t2, 16($t3)
+	sw $t2, 16($t0)
+	j resetDone
+
+switchDay:
+	li $t2, 1
+	sw $t2, time
+	la $t3, colourDay
+	la $t0, currCol
+	# change colours in currCol
+	lw $t2, 0($t3)
+	sw $t2, 0($t0)
+	lw $t2, 4($t3)
+	sw $t2, 4($t0)
+	lw $t2, 8($t3)
+	sw $t2, 8($t0)
+	lw $t2, 12($t3)
+	sw $t2, 12($t0)
+	lw $t2, 16($t3)
+	sw $t2, 16($t0)
+	j resetDone
+	
+# === Function to repaint screen ====							
 base: 
 	addi $sp, $sp, -4
 	sw $ra, 0($sp) # Push address of main function onto the stack
