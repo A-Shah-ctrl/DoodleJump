@@ -244,18 +244,25 @@ touchbar:
 		add $t8, $t8, $t5
 		
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
 		sub $t8, $t8, $t5
@@ -264,60 +271,84 @@ touchbar:
 		add $t8, $t8, $t5
 		
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+
 		sub $t8, $t8, $t5
 		
 		lw $t5, 8($t0)
 		add $t8, $t8, $t5
 		
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+
 		sub $t8, $t8, $t5
 		
 		lw $t5, 12($t0)
 		add $t8, $t8, $t5
 		
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT
+
 		sub $t8, $t8, $t5
 	
 		addi $t6, $t6, -128
@@ -327,80 +358,112 @@ touchbar:
 		add $t8, $t8, $t5
 		
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+
 		sub $t8, $t8, $t5
 		
 		lw $t5, 4($t0)
 		add $t8, $t8, $t5
 		
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+
 		sub $t8, $t8, $t5
 		
 		lw $t5, 8($t0)
 		add $t8, $t8, $t5
 		
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+
 		sub $t8, $t8, $t5
 		
 		lw $t5, 12($t0)
 		add $t8, $t8, $t5
 		
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+		addi $t5, $t5, 4
 		addi $t8, $t8, 4
 		beq $t6, $t8, CONT2
+
 		sub $t8, $t8, $t5
 		
 		addi $t6, $t6, -136
