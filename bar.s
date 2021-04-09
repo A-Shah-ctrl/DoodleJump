@@ -20,15 +20,13 @@
 #
 # Which approved additional features have been implemented?
 # (See the assignment handout for the list of additional features)
-# 1. (fill in the feature, if any)
-# 2. (fill in the feature, if any)
-# 3. (fill in the feature, if any)
-# - Dynamic Background, involves sun and moon
-# - Dynamic On-Screen Messages
+# 1. Dynamic Background, involves sun and moon
+# 2. (Dynamic On-Screen Messages
+# 3. (Difficulty) Number of platforms fluctuates
 # ... (add more if necessary)
 #
 # Any additional information that the TA needs to know:
-# - (write here, if any)
+# - Good luck marking this!
 #
 #####################################################################
 .data
@@ -60,8 +58,7 @@
 	
 main: 	
 	lbu $t0, 0xffff0000
-	bne $t0, 0, direction
-	direction: 
+	beq $t0, 0, IFmain
 	#la $s0, key
 	lbu $t0, 0xffff0004
 	beq $t0, 0x00006a, moveLeft # j is left
@@ -79,16 +76,85 @@ moveRight:
 	IFmain:
 		
 		beq $s3, $zero, ELSEmain
-		ble $s4, $s2, ELSEmain
+		blt $s4, $s2, ELSEmain
 		jal base
 		jal addBar
 		jal movement
-		jal base
-		jal movement
-		jal base
-		jal movement
-		jal base
-		jal movement
+		
+		lbu $t0, 0xffff0000
+		beq $t0, 0, IFmain2
+		#la $s0, key
+		lbu $t0, 0xffff0004
+		beq $t0, 0x00006a, moveLeft2 # j is left
+		beq $t0, 0x00006b, moveRight2 # k is right
+		j IFmain2
+		
+		moveLeft2:
+			addi $t6, $t6, -4
+			j IFmain2
+	
+		moveRight2:
+			addi $t6, $t6, 4
+			j IFmain2
+			
+		IFmain2:
+			jal base
+			jal movement
+			
+			#beq $s3, $zero, ELSEmain
+			#blt $s4, $s2, ELSEmain
+			jal base
+			jal movement
+		
+		lbu $t0, 0xffff0000
+		beq $t0, 0, IFmain3
+		#la $s0, key
+		lbu $t0, 0xffff0004
+		beq $t0, 0x00006a, moveLeft3 # j is left
+		beq $t0, 0x00006b, moveRight3 # k is right
+		j IFmain3
+		
+		moveLeft3:
+			addi $t6, $t6, -4
+			j IFmain3
+	
+		moveRight3:
+			addi $t6, $t6, 4
+			j IFmain3
+			
+		IFmain3:
+			jal base
+			jal movement
+		
+		lbu $t0, 0xffff0000
+		beq $t0, 0, IFmain4
+		#la $s0, key
+		lbu $t0, 0xffff0004
+		beq $t0, 0x00006a, moveLeft4 # j is left
+		beq $t0, 0x00006b, moveRight4 # k is right
+		j IFmain4
+		
+		moveLeft4:
+			addi $t6, $t6, -4
+			j IFmain4
+	
+		moveRight4:
+			addi $t6, $t6, 4
+			j IFmain4
+			
+		IFmain4:
+			jal base
+			jal movement
+			
+			
+			
+			
+			
+			#############
+		#jal base
+		#jal movement
+		#jal base
+		#jal movement
 		j REST
 		
 	
@@ -110,8 +176,8 @@ base:
 	lw $t0, displayAddress # Display address loaded
 	jal sky
 	jal paintSunMoon
-	jal paintBar
 	jal drawdoodle
+	jal paintBar
 	lw $ra, 0($sp)
 	addi $sp, $sp, 4 # Pop the address of main function from stack
 	jr $ra
@@ -219,6 +285,7 @@ movement:
 	lw $t0, 12($s0) # Fourth bar
 	addi $t0, $t0, 256
 	sw $t0, 12($s0)
+	
 	addi $s5, $s5, 256
 	IFmovement:
 		ble $s5, $zero, ELSEmovement
@@ -229,7 +296,7 @@ movement:
 	
 	LEFTmovement:
 		li $v0, 32
-		la $a0, 300
+		la $a0, 150
 		syscall
 		lw $ra, 0($sp)
 		addi $sp, $sp, 4 # Pop the address of main function from stack
@@ -260,7 +327,7 @@ jumpdoodle:
 		addi $s2, $s2, 128
 		bgtz $s2, CHANGE1
 		li $v0, 32
-		la $a0, 125
+		la $a0, 150
 		syscall
 		jr $ra
 	
@@ -273,7 +340,7 @@ jumpdoodle:
 	CHECK:	
 		beq $zero, $s5, CHANGE2
 		li $v0, 32
-		la $a0, 125
+		la $a0, 150
 		syscall
 		jr $ra
 	
@@ -282,7 +349,7 @@ jumpdoodle:
 		li $s3, 1
 		la $s5, ourconstant 
 		li $v0, 32
-		la $a0, 125
+		la $a0, 150
 		syscall
 		jr $ra
 		
@@ -290,7 +357,7 @@ jumpdoodle:
 		
 		li $s3, 0
 		li $v0, 32
-		la $a0, 125
+		la $a0, 150
 		syscall
 		jr $ra
 
@@ -300,7 +367,7 @@ touchbar:
 	
 	IFtouch:
 		
-		addi $t6, $t6, 128 	# bringing the left leg of doodler down
+		# bringing the left leg of doodler down
 		la $t0, bars
 		lw $t8, displayAddress
 		lw $t5, 0($t0)
@@ -413,10 +480,8 @@ touchbar:
 		beq $t6, $t8, CONT
 		addi $t5, $t5, 4
 		sub $t8, $t8, $t5
-	
-		addi $t6, $t6, -128
 		
-		addi $t6, $t6, 136 	# bringing the left leg of doodler down and right 2 units
+		addi $t6, $t6, 8 	# bringing the left leg of doodler down and right 2 units
 		lw $t5, 0($t0)
 		add $t8, $t8, $t5
 		
@@ -528,20 +593,19 @@ touchbar:
 
 		sub $t8, $t8, $t5
 		
-		addi $t6, $t6, -136
+		addi $t6, $t6, -8
 		
 		j ENDtouch
 	
 	CONT:
 		
-		addi $t6, $t6, -128
 		lw $s5, ourconstant
 		li $s3, 1
 		j message
 		#j ENDtouch
 	
 	CONT2:
-		addi $t6, $t6, -136
+		addi $t6, $t6, -8
 		lw $s5, ourconstant
 		li $s3, 1
 		j message
@@ -717,6 +781,7 @@ message:
 	beq $a0, 1, wow
 	beq $a0, 2, yay
 	beq $a0, 3, good
+	
 			
 yay: 	
 	la $s0, displayAddress
